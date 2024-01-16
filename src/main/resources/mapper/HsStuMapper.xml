@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.huanshi.hsproject.mapper.HsStuMapper">
+
+    <resultMap id="stuResultMap" type="com.huanshi.hsproject.entity.HsStu">
+        <id property="id" column="id"></id>
+        <result property="stuNo" column="stu_no"></result>
+        <result property="stuName" column="stu_name"></result>
+        <collection property="courseList" ofType="com.huanshi.hsproject.entity.HsCourse">
+            <id property="id" column="courseId"></id>
+            <result property="courseName" column="course_name"></result>
+            <result property="score" column="score"></result>
+            <result property="teacherName" column="teacherName"></result>
+        </collection>
+    </resultMap>
+
+    <select id="selectStuList" resultMap="stuResultMap">
+        select stu.*, course.id courseId,course.course_name,course.teacher_name teacherName, hs_course_stu.score score from hs_stu stu
+        left join hs_course_stu on stu.id = hs_course_stu.stu_id
+        left join hs_course course on hs_course_stu.course_id = course.id
+        <where>
+            <if test="stuName != null and stuName != ''">stu.stu_name LIKE CONCAT('%',#{stuName},'%')</if>
+        </where>
+        order by stu.id desc
+    </select>
+
+    <insert id="saveStu" useGeneratedKeys="true" keyProperty="id">
+        insert into hs_stu
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stuName != null and stuName != ''">stu_name,</if>
+            <if test="stuNo != null and stuNo != ''">stu_no,</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="stuName != null and stuName != ''">#{stuName},</if>
+            <if test="stuNo != null and stuNo != ''">#{stuNo},</if>
+        </trim>
+    </insert>
+
+    <update id="updateStu">
+        update hs_stu
+        <trim prefix="set" suffixOverrides=",">
+            <if test="stuName != null">stu_name = #{stuName},</if>
+            <if test="stuNo != null">stu_no = #{stuNo},</if>
+        </trim>
+            where id = #{id}
+    </update>
+
+    <delete id="deleteStu">
+        delete from hs_stu where id= #{id}
+    </delete>
+
+    <insert id="saveCourseStu">
+        insert into hs_course_stu (course_id, stu_id)
+        values
+        <foreach collection="courseIds" item="courseId" separator=",">
+            (#{courseId}, #{stuId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteCourseOfStu">
+        delete from hs_course_stu
+        where stu_id = #{stuId}
+        and course_id in
+        <foreach collection="courseIds" item="courseId" separator="," open="(" close=")">
+            #{courseId}
+        </foreach>
+    </delete>
+
+</mapper>

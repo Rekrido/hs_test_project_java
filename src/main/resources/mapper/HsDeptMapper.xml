@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.huanshi.hsproject.mapper.HsDeptMapper">
+
+    <resultMap id="deptResultMap" type="com.huanshi.hsproject.entity.HsDept">
+        <result property="id" column="did"></result>
+        <result property="deptName" column="dept_name"></result>
+        <result property="createTime" column="deptCreateTime"></result>
+        <collection property="empList" ofType="com.huanshi.hsproject.entity.HsEmp">
+            <result property="id" column="id"></result>
+            <result property="empName" column="emp_name"></result>
+            <result property="empSex" column="emp_sex"></result>
+            <result property="empAge" column="emp_age"></result>
+            <result property="empPhone" column="emp_phone"></result>
+            <result property="createTime" column="create_time"></result>
+        </collection>
+    </resultMap>
+
+    <select id="selectHsDept" resultMap="deptResultMap">
+        select dept.id did,dept.dept_name,dept.create_time deptCreateTime,emp.* from hs_dept dept
+        left join hs_emp emp on dept.id = emp.dept_id
+    </select>
+
+    <insert id="saveHsDept">
+        insert into hs_dept
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deptName != null and deptName != ''">dept_name</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="deptName != null and deptName != ''">#{deptName}</if>
+        </trim>
+    </insert>
+
+    <update id="updateHsDept">
+        update hs_dept
+        <trim prefix="SET">
+            <if test="dept.deptName != null">dept_name = #{dept.deptName}</if>
+        </trim>
+        where id = #{dept.id}
+    </update>
+
+    <delete id="deleteHsDept">
+        delete from hs_dept where id = #{id}
+    </delete>
+
+</mapper>

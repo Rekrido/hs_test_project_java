@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.huanshi.hsproject.mapper.HsEmpMapper">
+
+    <select id="selectHsEmpList" resultType="com.huanshi.hsproject.entity.HsEmp">
+        select emp.*,dept.dept_name deptName from hs_emp emp
+        left join hs_dept dept on emp.dept_id = dept.id
+        <where>
+            <if test="empName != null and empName != ''">and emp_name like concat('%',#{empName},'%') </if>
+            <if test="deptName != null and deptName != ''">and dept.dept_name like concat('%',#{deptName},'%') </if>
+        </where>
+    </select>
+
+    <insert id="saveHsEmp" >
+        insert into hs_emp
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="emp.empName != null and emp.empName != ''">emp_name,</if>
+            <if test="emp.empSex != null and emp.empSex != ''">emp_sex,</if>
+            <if test="emp.empAge != null and emp.empAge != ''">emp_age,</if>
+            <if test="emp.empPhone != null and emp.empPhone != ''">emp_phone,</if>
+            <if test="emp.deptId != null and emp.deptId != ''">dept_id</if>
+        </trim>
+        <trim prefix="values(" suffixOverrides="," suffix=")">
+            <if test="emp.empName != null and emp.empName != ''">#{emp.empName},</if>
+            <if test="emp.empSex != null and emp.empSex != ''">#{emp.empSex},</if>
+            <if test="emp.empAge != null and emp.empAge != ''">#{emp.empAge},</if>
+            <if test="emp.empPhone != null and emp.empPhone != ''">#{emp.empPhone},</if>
+            <if test="emp.deptId != null and emp.deptId != ''">#{emp.deptId}</if>
+        </trim>
+    </insert>
+
+    <update id="updateHsEmp" parameterType="com.huanshi.hsproject.entity.HsEmp">
+        update hs_emp
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="emp.empName != null">emp_name = #{emp.empName},</if>
+            <if test="emp.empSex != null">emp_sex = #{emp.empSex},</if>
+            <if test="emp.empAge != null">emp_age = #{emp.empAge},</if>
+            <if test="emp.empPhone != null">emp_phone = #{emp.empPhone},</if>
+            <if test="emp.deptId != null">dept_id = #{emp.deptId}</if>
+        </trim>
+        where id =#{emp.id}
+    </update>
+
+    <delete id="deleteHsEmp" parameterType="integer">
+        delete from hs_emp where id = #{id}
+    </delete>
+
+</mapper>
